@@ -2,6 +2,7 @@ import { ref, onUnmounted } from 'vue'
 
 import {useAuth} from "@vueuse/firebase"
 import { initializeApp } from "firebase/app";
+import {getAuth} from "firebase/auth";
 
 import {
     signInWithEmailAndPassword,
@@ -12,22 +13,23 @@ import {
 } from "firebase/auth";
 
 
-
-
-
-
 import {getFirestore} from "firebase/firestore";
 
 import { firebaseConfig } from '~/config/firebase'
 
-initializeApp(firebaseConfig)
+const firebaseapp = initializeApp(firebaseConfig)
+
+const firebaseAuth = getAuth(firebaseapp);
 
 const db = getFirestore()
 
-const { isAuthenticated, user } = useAuth()
+const { isAuthenticated, user } = useAuth(firebaseAuth)
 
 export const authentication = () => {
-  const signIn = () => signInWithPopup(new GoogleAuthProvider())
+  const signIn = () => {
+    alert(50); 
+  signInWithPopup(firebaseAuth,new GoogleAuthProvider());
+  }
   const sOut = () => signOut()
   return { signIn, sOut, isAuthenticated, user }
 }
