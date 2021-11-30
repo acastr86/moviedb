@@ -1,0 +1,4 @@
+<template>
+  <MoviesCards />
+  <Pagination />
+</template>
