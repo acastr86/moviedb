@@ -45,7 +45,7 @@
   import { database } from '~/helpers/useFirebase'
 
   const newComment = ref('')
-  const emit = defineEmit(['close'])
+  const emit = defineEmits(['close'])
 
   const props = defineProps({
     movie: {

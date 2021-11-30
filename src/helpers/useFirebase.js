@@ -12,6 +12,14 @@ import {
     signInWithPopup
 } from "firebase/auth";
 
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  addDoc,
+} from 'firebase/firestore';
 
 import {getFirestore} from "firebase/firestore";
 
@@ -37,27 +45,28 @@ export const authentication = () => {
 export const database = (movieId) => {
   const comments = ref([])
 
-  const commentsCollection = db.collection('')
-  const commentsQuery = commentsCollection
-    .where('movieId', '==', movieId)
-    .orderBy('createdAt')
+  const commentsCollection = collection(db, 'comments'); 
 
-  const unsubscribe = commentsQuery.onSnapshot((s) => {
-    comments.value = s.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-  })
+  const commentsQuery = query(commentsCollection, where('movieId', '==', movieId),orderBy('createdAt', 'desc'));
 
+    const unsubscribe = onSnapshot(commentsQuery, s => {
+      comments.value = s.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+    });
+
+ 
   onUnmounted(unsubscribe)
 
   const addComment = async (text) => {
     if (!isAuthenticated.value) return
     const { uid, displayName } = user.value
-    await commentsCollection.add({
+    await addDoc(
+    commentsCollection,{
       userName: displayName,
       userId: uid,
       movieId,
       text,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    })
+      createdAt: new Date() //firebase.firestore.FieldValue.serverTimestamp(),
+    });
   }
 
   return { comments, addComment }
